@@ -18,7 +18,7 @@
     .btn.primary{border-color:rgba(77,163,255,.45);background:rgba(77,163,255,.12)}
     .btn.danger{border-color:rgba(255,85,122,.45);background:rgba(255,85,122,.10)}
     .pill{padding:6px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-size:12px}
-    input,select,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);outline:none}
+    input,textarea{width:100%;padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);outline:none}
     textarea{min-height:110px;resize:vertical}
     .panel{margin-top:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden;box-shadow:var(--shadow)}
     .panelHead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -26,7 +26,7 @@
     .split{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}
     .card{border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.03);overflow:hidden}
     .pad{padding:12px}
-    .name{font-weight:800}
+    .name{font-weight:900}
     .muted{color:var(--muted)}
     .small{font-size:12px}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -36,7 +36,7 @@
 <body>
 <div class="wrap">
   <div class="topbar">
-    <div class="brand"><div class="dot"></div><span>CATALOG</span> <span class="pill">ADMIN</span></div>
+    <div class="brand"><div class="dot"></div><span>Thanh Hải Phụ Tùng</span> <span class="pill">ADMIN</span></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <a class="btn primary" href="./index.html">⬅ Home</a>
       <button class="btn" id="reloadBtn">🔄 Tải danh sách</button>
@@ -68,7 +68,7 @@
           <div class="pad">
             <div class="row" style="justify-content:space-between">
               <h3 style="margin:0">Danh sách</h3>
-              <input id="filter" placeholder="lọc nhanh..." style="max-width:260px"/>
+              <input id="filter" placeholder="lọc nhanh (name/oem/sku)..." style="max-width:320px"/>
             </div>
             <div id="list" style="margin-top:10px;display:grid;gap:10px"></div>
           </div>
@@ -84,23 +84,23 @@
             </div>
 
             <div class="row" style="margin-top:10px">
-              <input id="f_sku" placeholder="SKU (bắt buộc)" />
               <input id="f_name" placeholder="Tên (bắt buộc)" />
+              <input id="f_sku" placeholder="SKU (bắt buộc)" />
             </div>
 
             <div class="row" style="margin-top:10px">
+              <input id="f_oem" placeholder="OEM (bắt buộc)" />
+              <input id="f_oem_alt" placeholder="OEM thay thế (phẩy ,)" />
+            </div>
+
+            <div class="row" style="margin-top:10px">
+              <input id="f_qty" placeholder="Số lượng (qty)" />
               <input id="f_slug" placeholder="Slug (để trống tự tạo)" />
+            </div>
+
+            <div class="row" style="margin-top:10px">
               <input id="f_brand" placeholder="Brand" />
-            </div>
-
-            <div class="row" style="margin-top:10px">
               <input id="f_category" placeholder="Category" />
-              <input id="f_tags" placeholder="Tags: a,b,c" />
-            </div>
-
-            <div class="row" style="margin-top:10px">
-              <input id="f_price" placeholder="Price (number)" />
-              <input id="f_stock" placeholder="Stock (number)" />
             </div>
 
             <div style="margin-top:10px">
@@ -110,7 +110,7 @@
                   <input id="imgUpload" type="file" accept="image/*" style="display:none">
                 </label>
               </div>
-              <div class="muted small" style="margin-top:6px">Upload → Drive folder → tự lấy link và thêm vào Images.</div>
+              <div class="muted small" style="margin-top:6px">Upload ảnh → tự lưu Google Drive folder → tự thêm link.</div>
             </div>
 
             <div style="margin-top:10px"><input id="f_short" placeholder="Short description" /></div>
@@ -130,34 +130,32 @@
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxKVhD31siOzKUf0Apk8AS0qInEujEpApw-vlM6A-SWQmqMIYtv8UR7ia4EINyY6nb7pg/exec";
-const $ = (id)=>document.getElementById(id);
-const state = { token: localStorage.getItem("ADMIN_TOKEN")||"", items:[] };
+const API_URL="https://script.google.com/macros/s/AKfycbw8byC8jK_eLXGyU46v9R4ZbOemRplTTV-agfl4TEZnVZhJ5cqZJhFeNhKE5-IJqVI7zQ/exec";
+const $=(id)=>document.getElementById(id);
+const state={token:localStorage.getItem("ADMIN_TOKEN")||"",items:[]};
 
 async function apiGet(params){
-  const url = API_URL + "?" + new URLSearchParams(params).toString();
-  const res = await fetch(url);
+  const url=API_URL+"?"+new URLSearchParams(params).toString();
+  const res=await fetch(url);
   return await res.json();
 }
 async function apiPost(action, token, body){
-  const url = API_URL + "?" + new URLSearchParams({action, token}).toString();
-  const res = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body||{}) });
+  const url=API_URL+"?"+new URLSearchParams({action,token}).toString();
+  const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})});
   return await res.json();
 }
-function setStatePill(){
-  $("statePill").textContent = state.token ? "đã có token" : "chưa đăng nhập";
-}
-function setMsg(m){ $("msg").textContent = m||""; }
+function setMsg(m){ $("msg").textContent=m||""; }
+function setStatePill(){ $("statePill").textContent=state.token?"đã có token":"chưa đăng nhập"; }
 
 function newForm(){
   $("f_id").value=""; $("f_status").value="active";
-  $("f_sku").value=""; $("f_name").value=""; $("f_slug").value="";
-  $("f_brand").value=""; $("f_category").value=""; $("f_tags").value="";
-  $("f_price").value="0"; $("f_stock").value="0";
+  $("f_name").value=""; $("f_sku").value="";
+  $("f_oem").value=""; $("f_oem_alt").value="";
+  $("f_qty").value="0"; $("f_slug").value="";
+  $("f_brand").value=""; $("f_category").value="";
   $("f_images").value=""; $("f_short").value="";
   $("f_desc").value=""; $("f_specs").value="{}";
   $("previewBtn").href="#";
@@ -165,42 +163,46 @@ function newForm(){
 }
 function fillForm(p){
   $("f_id").value=p.id||""; $("f_status").value=p.status||"active";
-  $("f_sku").value=p.sku||""; $("f_name").value=p.name||""; $("f_slug").value=p.slug||"";
-  $("f_brand").value=p.brand||""; $("f_category").value=p.category||""; $("f_tags").value=p.tags||"";
-  $("f_price").value=String(p.price||0); $("f_stock").value=String(p.stock||0);
+  $("f_name").value=p.name||""; $("f_sku").value=p.sku||"";
+  $("f_oem").value=p.oem||""; $("f_oem_alt").value=p.oem_alt||"";
+  $("f_qty").value=String(p.qty||0); $("f_slug").value=p.slug||"";
+  $("f_brand").value=p.brand||""; $("f_category").value=p.category||"";
   $("f_images").value=(p.images||[]).join("|");
   $("f_short").value=p.short_desc||"";
   $("f_desc").value=p.desc_html||"";
   $("f_specs").value=p.specs_json||"{}";
-  $("previewBtn").href = "./product.html?slug=" + encodeURIComponent(p.slug||"");
+  $("previewBtn").href="./product.html?slug="+encodeURIComponent(p.slug||"");
   setMsg("Đang sửa: "+(p.slug||""));
 }
 function readForm(){
   return {
     id:$("f_id").value.trim(),
     status:$("f_status").value.trim()||"active",
-    sku:$("f_sku").value.trim(),
     name:$("f_name").value.trim(),
+    sku:$("f_sku").value.trim(),
+    oem:$("f_oem").value.trim(),
+    oem_alt:$("f_oem_alt").value.trim(),
+    qty:Number($("f_qty").value||0),
     slug:$("f_slug").value.trim(),
     brand:$("f_brand").value.trim(),
     category:$("f_category").value.trim(),
-    tags:$("f_tags").value.trim(),
-    price:Number($("f_price").value||0),
-    stock:Number($("f_stock").value||0),
-    images:$("f_images").value.trim(),
+    tags:"",
     short_desc:$("f_short").value.trim(),
     desc_html:$("f_desc").value,
-    specs_json:$("f_specs").value.trim()||"{}"
+    specs_json:$("f_specs").value.trim()||"{}",
+    images:$("f_images").value.trim(),
+    price:0
   };
 }
 function renderList(items){
-  $("countPill").textContent = String(items.length);
+  $("countPill").textContent=String(items.length);
   $("list").innerHTML = items.map(p=>`
     <div class="card">
       <div class="pad">
         <div class="row" style="justify-content:space-between">
           <div>
             <div class="name">${String(p.name||"")}</div>
+            <div class="muted small">OEM: <b>${String(p.oem||"")}</b> • SL: <b>${Number(p.qty||0)}</b></div>
             <div class="muted small">${String(p.sku||"")} • ${String(p.slug||"")} • ${String(p.status||"")}</div>
           </div>
           <div class="row">
@@ -220,32 +222,33 @@ function renderList(items){
     });
   });
 }
+
 async function loadAdmin(){
   if(!state.token){ setMsg("Chưa có token"); return; }
-  const d = await apiGet({action:"admin_list", token:state.token});
+  const d=await apiGet({action:"admin_list",token:state.token});
   if(!d.ok){ setMsg(d.error||"Lỗi"); return; }
-  state.items = d.items||[];
+  state.items=d.items||[];
   renderList(state.items);
   setMsg("Đã tải");
 }
 async function saveOne(){
   if(!state.token){ setMsg("Chưa có token"); return; }
-  const p = readForm();
-  if(!p.sku || !p.name){ setMsg("Thiếu SKU/Tên"); return; }
+  const p=readForm();
+  if(!p.name||!p.sku||!p.oem){ setMsg("Thiếu: Tên / SKU / OEM"); return; }
   try{ JSON.parse(p.specs_json||"{}"); }catch(e){ setMsg("specs_json sai JSON"); return; }
-  const d = await apiPost("upsert", state.token, {product:p});
+  const d=await apiPost("upsert",state.token,{product:p});
   if(!d.ok){ setMsg(d.error||"Lỗi lưu"); return; }
   setMsg(`OK: ${d.mode} • slug=${d.slug}`);
   await loadAdmin();
   if(d.slug) $("f_slug").value=d.slug;
-  $("previewBtn").href = "./product.html?slug=" + encodeURIComponent(d.slug||$("f_slug").value);
+  $("previewBtn").href="./product.html?slug="+encodeURIComponent(d.slug||$("f_slug").value);
 }
 async function delOne(){
   if(!state.token){ setMsg("Chưa có token"); return; }
   const id=$("f_id").value.trim();
   const slug=$("f_slug").value.trim();
-  if(!id && !slug){ setMsg("Chọn sản phẩm để xóa"); return; }
-  const d = await apiGet({action:"delete", token:state.token, id, slug});
+  if(!id&&!slug){ setMsg("Chọn sản phẩm để xóa"); return; }
+  const d=await apiGet({action:"delete",token:state.token,id,slug});
   if(!d.ok){ setMsg(d.error||"Lỗi xóa"); return; }
   setMsg("Đã xóa");
   newForm();
@@ -254,76 +257,79 @@ async function delOne(){
 
 /** upload image -> drive */
 function fileToBase64Raw(file){
-  return new Promise((resolve, reject)=>{
-    const r = new FileReader();
-    r.onload = ()=>{
-      const s = String(r.result||"");
-      const idx = s.indexOf("base64,");
-      resolve(idx>=0 ? s.slice(idx+7) : s);
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const s=String(r.result||"");
+      const idx=s.indexOf("base64,");
+      resolve(idx>=0?s.slice(idx+7):s);
     };
-    r.onerror = reject;
+    r.onerror=reject;
     r.readAsDataURL(file);
   });
 }
 $("imgUpload").addEventListener("change", async (ev)=>{
-  const file = ev.target.files && ev.target.files[0];
+  const file=ev.target.files&&ev.target.files[0];
   if(!file) return;
   if(!state.token){ setMsg("Chưa có token"); return; }
   setMsg("Đang upload ảnh...");
-  const base64 = await fileToBase64Raw(file);
-  const d = await apiPost("upload_image", state.token, { filename:file.name, mimeType:file.type||"image/jpeg", base64 });
+  const base64=await fileToBase64Raw(file);
+  const d=await apiPost("upload_image",state.token,{filename:file.name,mimeType:file.type||"image/jpeg",base64});
   if(!d.ok){ setMsg(d.error||"Upload lỗi"); return; }
-  const cur = $("f_images").value.trim();
-  $("f_images").value = cur ? (cur + "|" + d.url) : d.url;
+  const cur=$("f_images").value.trim();
+  $("f_images").value = cur ? (cur+"|"+d.url) : d.url;
   setMsg("Upload xong, đã thêm link");
   ev.target.value="";
 });
 
 /** Excel */
 function downloadTemplate(){
-  const headers=["id","slug","sku","name","brand","category","tags","short_desc","desc_html","specs_json","images","price","stock","status"];
+  const headers=["id","slug","sku","name","oem","oem_alt","brand","category","tags","short_desc","desc_html","specs_json","images","price","qty","status"];
   const ws=XLSX.utils.aoa_to_sheet([headers]);
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "template");
-  XLSX.writeFile(wb, "products_template.xlsx");
+  XLSX.utils.book_append_sheet(wb,ws,"template");
+  XLSX.writeFile(wb,"products_template.xlsx");
 }
 function exportExcel(){
   if(!state.items.length){ setMsg("Chưa có dữ liệu"); return; }
-  const headers=["id","slug","sku","name","brand","category","tags","short_desc","desc_html","specs_json","images","price","stock","status","created_at","updated_at"];
+  const headers=["id","slug","sku","name","oem","oem_alt","brand","category","tags","short_desc","desc_html","specs_json","images","price","qty","status","created_at","updated_at"];
   const rows=state.items.map(p=>[
-    p.id||"", p.slug||"", p.sku||"", p.name||"", p.brand||"", p.category||"", p.tags||"",
-    p.short_desc||"", p.desc_html||"", p.specs_json||"", (p.images||[]).join("|"),
-    Number(p.price||0), Number(p.stock||0), p.status||"active", p.created_at||"", p.updated_at||""
+    p.id||"",p.slug||"",p.sku||"",p.name||"",p.oem||"",p.oem_alt||"",p.brand||"",p.category||"",p.tags||"",
+    p.short_desc||"",p.desc_html||"",p.specs_json||"",
+    (p.images||[]).join("|"),Number(p.price||0),Number(p.qty||0),p.status||"active",
+    p.created_at||"",p.updated_at||""
   ]);
   const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "products");
-  XLSX.writeFile(wb, "products_export.xlsx");
+  XLSX.utils.book_append_sheet(wb,ws,"products");
+  XLSX.writeFile(wb,"products_export.xlsx");
 }
 function readXlsx(file){
-  return new Promise((resolve, reject)=>{
+  return new Promise((resolve,reject)=>{
     const r=new FileReader();
-    r.onload=(e)=>{ try{ resolve(XLSX.read(new Uint8Array(e.target.result), {type:"array"})); }catch(err){ reject(err);} };
+    r.onload=(e)=>{ try{ resolve(XLSX.read(new Uint8Array(e.target.result),{type:"array"})); }catch(err){ reject(err);} };
     r.onerror=reject;
     r.readAsArrayBuffer(file);
   });
 }
 $("importFile").addEventListener("change", async (ev)=>{
-  const file = ev.target.files && ev.target.files[0];
+  const file=ev.target.files&&ev.target.files[0];
   if(!file) return;
   if(!state.token){ setMsg("Chưa có token"); return; }
 
   try{
     setMsg("Đang đọc Excel...");
-    const wb = await readXlsx(file);
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(ws, {defval:"", raw:false});
+    const wb=await readXlsx(file);
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:"",raw:false});
 
-    const items = rows.map(r=>({
+    const items=rows.map(r=>({
       id:String(r.id||"").trim(),
       slug:String(r.slug||"").trim(),
       sku:String(r.sku||"").trim(),
       name:String(r.name||"").trim(),
+      oem:String(r.oem||"").trim(),
+      oem_alt:String(r.oem_alt||"").trim(),
       brand:String(r.brand||"").trim(),
       category:String(r.category||"").trim(),
       tags:String(r.tags||"").trim(),
@@ -332,12 +338,12 @@ $("importFile").addEventListener("change", async (ev)=>{
       specs_json:String(r.specs_json||"{}").trim()||"{}",
       images:String(r.images||"").trim(),
       price:Number(r.price||0),
-      stock:Number(r.stock||0),
+      qty:Number(r.qty||0),
       status:String(r.status||"active").trim()||"active"
     }));
 
     setMsg("Đang import...");
-    const d = await apiPost("batch_upsert", state.token, {items});
+    const d=await apiPost("batch_upsert",state.token,{items});
     if(!d.ok){ setMsg(d.error||"Import lỗi"); return; }
     setMsg(`Import OK: created=${d.created}, updated=${d.updated}, skipped=${d.skipped}, errors=${(d.errors||[]).length}`);
     await loadAdmin();
@@ -350,10 +356,9 @@ $("importFile").addEventListener("change", async (ev)=>{
 
 /** wiring */
 $("saveTokenBtn").addEventListener("click", ()=>{
-  state.token = $("token").value.trim();
-  localStorage.setItem("ADMIN_TOKEN", state.token);
-  setStatePill();
-  setMsg("Đã lưu token");
+  state.token=$("token").value.trim();
+  localStorage.setItem("ADMIN_TOKEN",state.token);
+  setStatePill(); setMsg("Đã lưu token");
 });
 $("logoutBtn").addEventListener("click", ()=>{
   state.token=""; localStorage.removeItem("ADMIN_TOKEN");
@@ -363,21 +368,20 @@ $("reloadBtn").addEventListener("click", loadAdmin);
 $("newBtn").addEventListener("click", newForm);
 $("saveBtn").addEventListener("click", saveOne);
 $("delBtn").addEventListener("click", delOne);
+$("exportBtn").addEventListener("click", exportExcel);
+$("tplBtn").addEventListener("click", downloadTemplate);
 
 $("filter").addEventListener("input", ()=>{
   const q=$("filter").value.trim().toLowerCase();
-  const items = state.items.filter(p=>{
-    const hay=[p.name,p.sku,p.slug].map(x=>String(x||"").toLowerCase()).join(" | ");
+  const items=state.items.filter(p=>{
+    const hay=[p.name,p.sku,p.oem,p.oem_alt].map(x=>String(x||"").toLowerCase()).join(" | ");
     return !q || hay.includes(q);
   });
   renderList(items);
 });
 
-$("exportBtn").addEventListener("click", exportExcel);
-$("tplBtn").addEventListener("click", downloadTemplate);
-
 (async function(){
-  $("token").value = state.token;
+  $("token").value=state.token;
   setStatePill();
   newForm();
   if(!API_URL.includes("script.google.com")) setMsg("Bạn chưa dán API_URL");
